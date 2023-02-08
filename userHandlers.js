@@ -30,7 +30,22 @@ console.log(id);
   });
 };
 
+const postUser = (req, res) => {
+  const { firstname, lastname, email, city, language } = req.body;
+
+  database.query("INSERT INTO express_quests.users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)", [firstname, lastname, email, city, language]).then(([result]) => {
+    res.location(`/api/users/${result.insertId}`).sendStatus(201);
+  }).catch((err) => {
+    console.error(err);
+    res.status(500).send("Error saving the user");
+  });
+
+  //  console.log(req.body);
+  // res.send("Post route os working 🎉");
+};
+
 module.exports = {
   getUsers,
   getUserById,
+  postUser,
 };
