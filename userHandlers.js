@@ -3,7 +3,7 @@ constmysql =require("mysql2/promise");
 const database = require("./database");
 
 const getUsers = (req, res) => {
-  database.query("select * from express_quests.users")
+  database.query("select id, firstname, lastname, email, city, language from express_quests.users")
   .then(([users]) =>{
     res.json(users);
     res.status(200);
@@ -18,7 +18,7 @@ const getUsers = (req, res) => {
 const getUserById = (req, res) => {
   const id = parseInt(req.params.id);
 console.log(id);
-  database.query("select * from express_quests.users where id = ?", [id]).then(([users]) => {
+  database.query("select firstname, lastname, email, city, language from express_quests.users where id = ?", [id]).then(([users]) => {
     if (users[0] != null) {
       res.status(200).json(users[0]);
     } else {
@@ -31,9 +31,9 @@ console.log(id);
 };
 
 const postUser = (req, res) => {
-  const { firstname, lastname, email, city, language } = req.body;
+  const { firstname, lastname, email, city, language, hashedPassword } = req.body;
 
-  database.query("INSERT INTO express_quests.users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)", [firstname, lastname, email, city, language]).then(([result]) => {
+  database.query("INSERT INTO express_quests.users(firstname, lastname, email, city, language, hashedPassword) VALUES (?, ?, ?, ?, ?, ?)", [firstname, lastname, email, city, language, hashedPassword]).then(([result]) => {
     res.location(`/api/users/${result.insertId}`).sendStatus(201);
   }).catch((err) => {
     console.error(err);
@@ -46,9 +46,9 @@ const postUser = (req, res) => {
 
 const updateUser = (req, res) => {
   const id = parseInt(req.params.id);
-  const { firstname, lastname, email, city, language } = req.body;
+  const { firstname, lastname, email, city, language, hashedPassword } = req.body;
 
-  database.query("update express_quests.users set firstname = ?, lastname = ?, email = ?, city =?, language = ? where id = ?", [firstname, lastname, email, city, language, id]).then(([result]) => {
+  database.query("update express_quests.users set firstname = ?, lastname = ?, email = ?, city =?, language = ?, hashedPassword = ? where id = ?", [firstname, lastname, email, city, language, hashedPassword, id]).then(([result]) => {
     if (result.affectedRows === 0) {
       res.status(404).send("Not found");
     } else {
